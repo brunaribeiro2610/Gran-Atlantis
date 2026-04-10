@@ -49,3 +49,6 @@ gran_atlantis/
 ├── templates/         # Arquivos HTML (Base, Login, Dashboard, Tabelas)
 ├── manage.py          # Gerenciador do Django
 └── requirements.txt   # Dependências do sistema
+
+👩‍💻 Autora
+Bruna Ribeiro Desenvolvido durante o curso de Desenvolvimento de Sistemas.
