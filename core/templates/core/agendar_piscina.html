@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center py-4">
+    <div class="col-md-5">
+
+        {# --- MUDAMOS PARA CÁ: O BLOCO DE SUCESSO AGORA ESTÁ DENTRO DO CONTENT --- #}
+        {% if sucesso %}
+        <div class="alert alert-success border-gold bg-dark text-white text-center shadow-lg mb-4">
+            <h4 class="text-gold">🏊‍♂️ Piscina Agendada!</h4>
+            <p>Sua reserva para a unidade <strong>{{ request.user.casa_bloco }}</strong> foi confirmada.</p>
+            <p class="mb-0">Data: {{ reserva_sucesso.data|date:"d/m" }} às {{ reserva_sucesso.hora_inicio }}</p>
+            <hr class="border-secondary">
+            <p class="small text-white-50">Redirecionando para o painel...</p>
+        </div>
+
+        <script>
+            setTimeout(function() {
+                window.location.href = "{% url 'core:dashboard' %}";
+            }, 3000);
+        </script>
+        {% endif %}
+
+        <div class="card-atlantis shadow-lg p-4 border-gold">
+            <h3 class="text-center mb-2" style="color: var(--gold-logo); font-weight: bold;">🏊 RESERVAR PISCINA</h3>
+            <p class="text-center text-white-50 small mb-4">Regra Gran Atlantis: Blocos de 1h | Máx. 2 unidades por vez</p>
+            
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert {% if message.tags == 'success' %}alert-success bg-dark text-success border-success{% else %}alert-danger bg-dark text-gold border-gold{% endif %} small py-2 shadow-sm">
+                        <i class="bi bi-info-circle me-2"></i>{{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="post" class="mt-2">
+                {% csrf_token %}
+                
+                <div class="mb-4">
+                    <label class="form-label text-gold small fw-bold">1. SELECIONE A DATA:</label>
+                    <input type="date" name="data" class="form-control form-control-atlantis shadow-none" 
+                           required min="{{ today|date:'Y-m-d' }}">
+                </div>
+                
+                <div class="mb-4">
+                    <label class="form-label text-gold small fw-bold">2. SELECIONE O HORÁRIO:</label>
+                    <select name="hora" class="form-select form-control-atlantis shadow-none" required>
+                        <option value="" disabled selected>Escolha um horário disponível</option>
+                        {% for h in horarios %}
+                            <option value="{{ h }}">{{ h }} às {{ h|slice:":2"|add:"1" }}:00</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <button type="submit" class="btn btn-atlantis w-100 py-3 mt-2 fw-bold shadow">
+                    <i class="bi bi-calendar-check me-2"></i>CONFIRMAR RESERVA
+                </button>
+            </form>
+            
+            <div class="text-center mt-4 pt-3 border-top border-secondary">
+                <a href="{% url 'core:dashboard' %}" class="btn btn-outline-danger btn-sm px-4">
+                    <i class="bi bi-arrow-left"></i> Voltar ao Painel
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    input[type="date"]::-webkit-calendar-picker-indicator {
+        filter: invert(1);
+        cursor: pointer;
+    }
+</style>
+{% endblock %}

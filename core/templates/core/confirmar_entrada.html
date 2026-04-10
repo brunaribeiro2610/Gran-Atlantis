@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5 text-center">
+    <div class="card-atlantis border-gold p-5 d-inline-block shadow-lg" style="max-width: 500px; width: 100%;">
+        <div class="fs-1 mb-3">✅</div>
+        <h2 class="text-gold mb-4">Visita Agendada!</h2>
+        
+        <p class="text-white">O registro para <strong>{{ visita.nome }}</strong> foi concluído.</p>
+
+        {% if visita.qr_code %}
+        <div class="bg-white p-3 rounded my-4">
+            <img src="{{ visita.qr_code.url }}" alt="QR Code" class="img-fluid" style="width: 200px;">
+        </div>
+        {% endif %}
+
+        <div class="bg-dark p-3 rounded border border-secondary text-start mb-4">
+            <small class="text-gold d-block small">DATA DA VISITA:</small>
+            <span class="text-white fw-bold">{{ visita.data_visita|date:"d/m/Y" }}</span>
+        </div>
+
+        <div class="d-grid gap-2">
+            <button onclick="compartilharWhatsApp()" class="btn btn-success fw-bold py-3 mb-2" style="background-color: #25d366; border: none;">
+                <i class="bi bi-whatsapp"></i> COMPARTILHAR CONVITE
+            </button>
+
+            <a href="{% url 'core:dashboard' %}" class="btn btn-atlantis py-3">Voltar ao Início</a>
+        </div>
+    </div>
+</div>
+
+<script>
+function compartilharWhatsApp() {
+    const nome = "{{ visita.nome }}";
+    // Usando o campo correto da data
+    const data = "{{ visita.data_visita|date:'d/m/Y' }}";
+    const linkAcesso = "https://pyrophoric-daleyza-precorruptive.ngrok-free.dev/visita/detalhes/{{ visita.id }}/";
+    
+    const texto = `Olá ${nome}! Seu convite para o Gran Atlantis está pronto. ✅\n📅 Data: ${data}\n\nApresente o QR Code no link abaixo ao chegar:\n${linkAcesso}`;
+    
+    const url = `https://wa.me/?text=${encodeURIComponent(texto)}`;
+    window.open(url, '_blank');
+}
+</script>
+
+<style>
+    .card-atlantis { background: #1a1a1a; border-radius: 15px; }
+    .text-gold { color: #c5a059; }
+    .border-gold { border: 1px solid #c5a059 !important; }
+    .btn-atlantis { background-color: #c5a059; color: #000; font-weight: bold; border: none; }
+    .btn-atlantis:hover { background-color: #a38446; color: #fff; }
+</style>
+{% endblock %}

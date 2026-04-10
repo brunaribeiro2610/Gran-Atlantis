@@ -1,0 +1,352 @@
+{% extends 'base.html' %}
+
+<script src="https://unpkg.com/html5-qrcode"></script>
+
+{% block content %}
+
+{# --- CABEÇALHO (PARA TODOS) --- #}
+<div class="row mb-4 align-items-center">
+    <div class="col-md-8">
+        <h2 style="color: var(--gold-logo); font-weight: bold; letter-spacing: 1px; text-transform: uppercase;">PORTAL ATLANTIS</h2>
+        <div class="d-flex flex-wrap align-items-center gap-2">
+            <span class="text-white">Olá, <span class="text-gold fw-bold">{{ user.username }}</span></span>
+            <span class="text-white-50">|</span>
+            <span class="text-white small">Unidade: {{ user.casa_bloco|default:"Administração" }}</span>
+            <span class="badge bg-dark border border-gold text-gold">{{ user_role_fixed }}</span>
+        </div>
+    </div>
+    <div class="col-md-4 text-md-end mt-3 mt-md-0">
+        <form action="{% url 'logout' %}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-danger btn-sm px-3 shadow-sm">
+                <i class="bi bi-box-arrow-right"></i> Sair do Sistema
+            </button>
+        </form>
+    </div>
+</div>
+
+<hr class="border-secondary mb-4">
+
+{# --- MURAL DE AVISOS (PARA TODOS) --- #}
+<div class="row mb-5">
+    <div class="col-12">
+        <div class="card-atlantis border-gold shadow p-4">
+            <h5 class="text-gold mb-3 text-start"><i class="bi bi-megaphone-fill me-2"></i>Avisos do Condomínio</h5>
+            <div class="list-group list-group-flush bg-transparent">
+                {% for aviso in avisos %}
+                <div class="list-group-item bg-transparent text-white border-secondary px-0 py-3 text-center">
+                    <h6 class="mb-1 text-gold fw-bold">{{ aviso.titulo }}</h6>
+                    <p class="mb-0 text-white-50 small">{{ aviso.conteudo }}</p>
+                    <span class="text-white-50 x-small">{{ aviso.data_postagem|date:"d/m" }}</span>
+                </div>
+                {% empty %}
+                <p class="text-center text-white-50 py-3">Nenhum comunicado no momento.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{# ========================================== #}
+{#     LOGICA DE VISIBILIDADE POR CARGO       #}
+{# ========================================== #}
+
+{% if user_role_fixed == "SINDICO" %}
+    {# --- VISÃO DO SÍNDICO --- #}
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card-atlantis h-100 border-gold text-center p-3">
+                <div class="fs-2 mb-2">👔</div>
+                <h6 class="text-gold">Gestão de Equipe</h6>
+                <a href="{% url 'core:cadastrar_funcionario' %}" class="btn btn-atlantis btn-sm w-100 mt-2">Novo Funcionário</a>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card-atlantis h-100 border-gold text-center p-3">
+                <div class="fs-2 mb-2">📢</div>
+                <h6 class="text-gold">Mural de Avisos</h6>
+                <a href="{% url 'core:criar_aviso' %}" class="btn btn-atlantis btn-sm w-100 mt-2">Novo Aviso</a>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card-atlantis h-100 border-gold text-center p-3">
+                <div class="fs-2 mb-2">🏢</div>
+                <h6 class="text-gold">Financeiro</h6>
+                <a href="{% url 'core:enviar_balancete' %}" class="btn btn-atlantis btn-sm w-100 mt-2">Enviar Balancete</a>
+            </div>
+        </div>
+    </div>
+    {% include 'core/includes/tabela_encomendas_portaria.html' %}
+
+{% elif user_role_fixed == "PORTEIRO" %}
+    {# --- VISÃO DO PORTEIRO --- #}
+    <div class="row g-3 mb-5">
+        <div class="col-md-4">
+            <div class="card-atlantis h-100 border-gold shadow p-4 d-flex flex-column text-center">
+                <div class="fs-1 mb-2">📋</div>
+                <h5 class="text-gold fw-bold">Controle de Acessos</h5>
+                <p class="small text-white-50 flex-grow-1">Visualize a lista de convidados e entradas autorizadas.</p>
+                <a href="{% url 'core:lista_visitas' %}" class="btn btn-atlantis w-100 mt-3">Ver Lista</a>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card-atlantis h-100 border-gold shadow p-4 d-flex flex-column text-center">
+                <div class="fs-1 mb-2">📦</div>
+                <h5 class="text-gold fw-bold">Entrada de Encomendas</h5>
+                <p class="small text-white-50 flex-grow-1">Registre a chegada de pacotes e correspondências.</p>
+                <a href="{% url 'core:registrar_encomenda' %}" class="btn btn-atlantis w-100 mt-3">Novo Registro</a>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card-atlantis h-100 border-gold shadow p-4 d-flex flex-column text-center">
+                <div class="fs-1 mb-2">📸</div>
+                <h5 class="text-gold fw-bold">Escanear QR Code</h5>
+                <p class="small text-white-50 flex-grow-1">Valide a entrada de visitantes via câmera.</p>
+                <button id="btn-scan" class="btn btn-atlantis w-100 mt-3">Abrir Câmera</button>
+                <div id="reader-container" class="mt-3" style="display: none;">
+                    <div id="reader" style="width: 100%; max-width: 280px; margin: 0 auto; border: 2px solid var(--gold-logo); border-radius: 12px; overflow: hidden;"></div>
+                    <button id="btn-stop" class="btn btn-sm btn-outline-danger mt-2">Fechar Câmera</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% include "core/includes/tabela_encomendas_portaria.html" %}
+
+    {# --- MAPA DE USO DO DIA (PISCINA E SALÃO) ATUALIZADO --- #}
+    <div class="row mt-5 mb-5">
+        <div class="col-md-6">
+            <div class="card-atlantis border-gold shadow p-4">
+                <h5 class="text-gold mb-3 text-center"><i class="bi bi-water me-2"></i>Piscina - Hoje</h5>
+                <table class="table table-dark table-sm text-center">
+                    <thead>
+                        <tr class="text-gold small">
+                            <th>Morador</th>
+                            <th>Unidade</th>
+                            <th>Hora</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for reserva in reservas_piscina_hoje %}
+                        <tr class="border-secondary align-middle">
+                            <td>{{ reserva.morador.username }}</td>
+                            <td class="text-warning small fw-bold">{{ reserva.morador.casa_bloco|default:"-" }}</td>
+                            <td>{{ reserva.hora_inicio }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="3" class="text-white-50 small py-2">Sem reservas</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card-atlantis border-gold shadow p-4">
+                <h5 class="text-gold mb-3 text-center"><i class="bi bi-house-heart me-2"></i>Salão - Hoje</h5>
+                <table class="table table-dark table-sm text-center">
+                    <thead>
+                        <tr class="text-gold small">
+                            <th>Morador</th>
+                            <th>Unidade</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for reserva in reservas_salao_hoje %}
+                        <tr class="border-secondary align-middle">
+                            <td>{{ reserva.morador.username }}</td>
+                            <td class="text-warning small fw-bold">{{ reserva.morador.casa_bloco|default:"-" }}</td>
+                            <td><span class="badge bg-success">Reservado</span></td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="3" class="text-white-50 small py-2">Livre hoje</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+{% else %}
+    {# --- VISÃO DO MORADOR --- #}
+    <div class="row g-4 mb-5">
+        <div class="col-md-3">
+            <div class="card-atlantis h-100 border-gold shadow text-center p-4">
+                <div class="fs-1 mb-2">📢</div>
+                <h5 class="text-gold">Ocorrências</h5>
+                <p class="small text-white-50">Registrar reclamação.</p>
+                <a href="{% url 'core:minhas_ocorrencias' %}" class="btn btn-atlantis mt-auto w-100">Registrar</a>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card-atlantis h-100 shadow border-gold p-4 text-center">
+                <div class="fs-1 mb-2">🏊</div>
+                <h4 class="text-gold">PISCINA</h4>
+                <p class="text-white-50 small">Agendamentos de 1h</p>
+                <a href="{% url 'core:agendar_piscina' %}" class="btn btn-atlantis w-100 mt-auto">AGENDAR</a>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card-atlantis h-100 shadow border-gold p-4 text-center">
+                <div class="fs-1 mb-2">🎉</div>
+                <h4 class="text-gold">SALÃO</h4>
+                <p class="text-white-50 small">Reserva do dia</p>
+                <a href="{% url 'core:agendar_salao' %}" class="btn btn-atlantis w-100 mt-auto">AGENDAR</a>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card-atlantis h-100 border-gold shadow text-center p-4">
+                <div class="fs-1 mb-2">🔑</div>
+                <h5 class="text-gold">Visitantes</h5>
+                <p class="small text-white-50">Gerar QR Code rápido.</p>
+                <a href="{% url 'core:agendar_visita' %}" class="btn btn-atlantis mt-auto w-100">Gerar Acesso</a>
+            </div>
+        </div>
+    </div>
+
+    {# --- MEUS AGENDAMENTOS ATIVOS --- #}
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card-atlantis border-gold shadow p-4">
+                <h5 class="text-gold mb-4"><i class="bi bi-calendar-check me-2"></i>Meus Agendamentos</h5>
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover align-middle mb-0 text-center">
+                        <thead>
+                            <tr class="text-gold small border-secondary">
+                                <th>Espaço</th>
+                                <th>Data</th>
+                                <th>Detalhes</th>
+                                <th>Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for reserva in minhas_reservas_piscina %}
+                            <tr class="border-secondary">
+                                <td>🏊 Piscina</td>
+                                <td>{{ reserva.data|date:"d/m/Y" }}</td>
+                                <td>{{ reserva.hora_inicio|time:"H:i" }}</td>
+                                <td>
+                                    <a href="{% url 'core:cancelar_piscina' reserva.pk %}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Cancelar?')">Excluir</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            {% for reserva in minhas_reservas_salao %}
+                            <tr class="border-secondary">
+                                <td>🎉 Salão de Festas</td>
+                                <td>{{ reserva.data|date:"d/m/Y" }}</td>
+                                <td>Dia Completo</td>
+                                <td>
+                                    <a href="{% url 'core:cancelar_salao' reserva.pk %}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Cancelar?')">Excluir</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            {% if not minhas_reservas_piscina and not minhas_reservas_salao %}
+                            <tr><td colspan="4" class="py-3 text-white-50">Nenhuma reserva agendada.</td></tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# --- MINHAS ENCOMENDAS --- #}
+    <div id="minhas-encomendas" class="row mb-5">
+        <div class="col-12">
+            <div class="card-atlantis border-gold shadow p-0 overflow-hidden">
+                <div class="p-3 bg-dark border-bottom border-gold text-gold text-center">
+                    <h5 class="mb-0">📦 Minhas Encomendas</h5>
+                </div>
+                <table class="table table-dark table-hover mb-0 text-center">
+                    <tbody>
+                        {% for enc in encomendas %}
+                            <tr>
+                                <td>{{ enc.data_recebimento|date:"d/m H:i" }}</td>
+                                <td>{{ enc.descricao }}</td>
+                                <td><span class="badge bg-warning text-dark">Pendente</span></td>
+                            </tr>
+                        {% empty %}
+                        <tr><td colspan="3" class="py-4 text-white-50">Nada pendente.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+{# --- TRANSPARÊNCIA FINANCEIRA --- #}
+<div class="row mb-5 mt-4">
+    <div class="col-12">
+        <div class="card-atlantis border-gold shadow p-4 text-center">
+            <h5 class="text-gold mb-4">
+                <span class="fs-4 me-2">📑</span> Transparência Financeira
+            </h5>
+            <div class="row g-3 justify-content-center">
+                {% for b in balancetes %}
+                <div class="col-md-3">
+                    <a href="{{ b.arquivo.url }}" target="_blank" class="text-decoration-none">
+                        <div class="p-3 rounded border border-secondary bg-dark shadow-hover card-finance">
+                            <h6 class="text-white fw-bold mb-1">Balancete {{ b.mes_referencia|date:"M/Y" }}</h6>
+                            <small class="text-gold">Abrir PDF</small>
+                        </div>
+                    </a>
+                </div>
+                {% empty %}
+                <p class="text-white-50 small">Nenhum balancete disponível.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root { --gold-logo: #c5a059; }
+    .text-gold { color: var(--gold-logo); }
+    .border-gold { border-color: var(--gold-logo) !important; }
+    .card-atlantis { background: #1a1a1a; border-radius: 12px; border: 1px solid transparent; }
+    .btn-atlantis { background-color: var(--gold-logo); color: #000; font-weight: bold; border: none; }
+    .btn-atlantis:hover { background-color: #a38446; color: #fff; }
+    .shadow-hover:hover { border-color: var(--gold-logo) !important; transform: translateY(-3px); transition: 0.3s; }
+</style>
+
+<script>
+    // Código do QR Code omitido aqui para brevidade, mantenha o seu original abaixo
+    let html5QrCode;
+    const btnScan = document.getElementById('btn-scan');
+    const btnStop = document.getElementById('btn-stop');
+    const readerContainer = document.getElementById('reader-container');
+
+    btnScan.addEventListener('click', function() {
+        readerContainer.style.display = 'block';
+        btnScan.style.display = 'none'; 
+        html5QrCode = new Html5Qrcode("reader");
+        const config = { fps: 15, qrbox: { width: 200, height: 200 }, aspectRatio: 1.0 };
+        html5QrCode.start(
+            { facingMode: "environment" }, 
+            config, 
+            (decodedText) => {
+                html5QrCode.stop(); 
+                document.getElementById('reader').innerHTML = `
+                    <div class="p-3 text-center">
+                        <div class="spinner-border text-warning" role="status"></div>
+                        <p class="mt-2 text-gold">Validando acesso...</p>
+                    </div>
+                `;
+                window.location.href = "/portaria/autorizar/" + decodedText + "/";
+            }
+        ).catch(err => alert("Erro ao abrir câmera: " + err));
+    });
+
+    btnStop.addEventListener('click', function() {
+        if (html5QrCode) {
+            html5QrCode.stop().then(() => {
+                readerContainer.style.display = 'none';
+                btnScan.style.display = 'block';
+            });
+        }
+    });
+</script>
+{% endblock %}

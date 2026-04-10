@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card-atlantis border-gold shadow-lg">
+            <div class="d-flex align-items-center mb-4">
+                <div style="font-size: 2rem;" class="me-3">📝</div>
+                <div>
+                    <h3 class="text-gold mb-0">Registrar Ocorrência</h3>
+                    <p class="text-white-50 small mb-0">Relate incidentes, sugestões ou problemas no condomínio.</p>
+                </div>
+            </div>
+            
+            <hr class="border-secondary mb-4">
+
+            <form method="post">
+                {% csrf_token %}
+                
+                {% if form.errors %}
+                <div class="alert alert-danger bg-danger text-white border-0">
+                    Por favor, corrija os erros abaixo.
+                </div>
+                {% endif %}
+
+                <div class="mb-3">
+                    <label class="form-label text-gold fw-bold">Título da Ocorrência</label>
+                    <input type="text" name="titulo" class="form-control bg-dark text-white border-secondary focus-gold" placeholder="Ex: Lâmpada queimada no corredor" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label text-gold fw-bold">Descrição Detalhada</label>
+                    <textarea name="descricao" rows="5" class="form-control bg-dark text-white border-secondary focus-gold" placeholder="Descreva o que aconteceu..." required></textarea>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label text-gold fw-bold">Categoria</label>
+                        <select name="categoria" class="form-select bg-dark text-white border-secondary">
+                            <option value="MANUTENCAO">Manutenção</option>
+                            <option value="BARULHO">Barulho / Reclamação</option>
+                            <option value="SEGURANCA">Segurança</option>
+                            <option value="OUTROS">Outros</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-gold fw-bold">Urgência</label>
+                        <div class="d-flex gap-3 mt-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="urgencia" id="baixa" value="baixa" checked>
+                                <label class="form-check-label text-white" for="baixa">Baixa</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="urgencia" id="alta" value="alta">
+                                <label class="form-check-label text-danger" for="alta">Alta</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-atlantis btn-lg">
+                        <i class="bi bi-check-circle"></i> Enviar Ocorrência
+                    </button>
+                    <a href="{% url 'core:dashboard' %}" class="btn btn-outline-light">
+                        <i class="bi bi-arrow-left"></i> Voltar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .focus-gold:focus {
+        border-color: var(--gold-logo) !important;
+        box-shadow: 0 0 0 0.25rem rgba(212, 175, 55, 0.25) !important;
+        background-color: #1a1a1a !important;
+    }
+    .form-control::placeholder {
+        color: #6c757d;
+        font-style: italic;
+    }
+</style>
+{% endblock %}

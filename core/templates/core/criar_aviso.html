@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card-atlantis">
+            <h3 class="text-gold"><i class="bi bi-megaphone"></i> Novo Aviso no Mural</h3>
+            <hr class="border-secondary">
+            
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3 text-gold">
+                    <label>Título do Aviso</label>
+                    {{ form.titulo }}
+                </div>
+                <div class="mb-3 text-gold">
+                    <label>Conteúdo</label>
+                    {{ form.conteudo }}
+                </div>
+                <div class="form-check mb-4">
+                    {{ form.importante }}
+                    <label class="form-check-label text-gold">Marcar como Importante (Destaque)</label>
+                </div>
+                
+                <button type="submit" class="btn btn-atlantis w-100">Publicar no Mural</button>
+                <a href="{% url 'core:dashboard' %}" class="btn btn-atlantis w-100 mt-2">Cancelar</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card-atlantis shadow-lg">
+            <h3 class="text-center mb-4" style="color: var(--gold-logo);">
+                <i class="bi bi-calendar-check"></i> Reservar Salão
+            </h3>
+            <p class="text-center text-muted small">Reserva exclusiva para o dia inteiro (uso único).</p>
+            
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-danger bg-dark text-gold border-gold small py-2">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="post" class="mt-4">
+                {% csrf_token %}
+                <div class="mb-4">
+                    <label class="form-label text-gold small">Selecione a Data:</label>
+                    <input type="date" name="data" class="form-control form-control-atlantis" required>
+                </div>
+                
+                <button type="submit" class="btn btn-atlantis w-100 py-2 mt-2">Confirmar Reserva</button>
+            </form>
+            
+            <div class="text-center mt-4">
+                <a href="{% url 'core:dashboard' %}" class="text-muted small text-decoration-none">← Voltar para Dashboard</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

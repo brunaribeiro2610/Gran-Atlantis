@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card-atlantis border-gold shadow-lg">
+            <h4 class="text-gold mb-3"><i class="bi bi-chat-left-dots"></i> Registrar Ocorrência</h4>
+            <p class="text-white-50 small mb-4">Utilize este canal para sugestões, reclamações ou comunicar problemas no condomínio.</p>
+            
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="mb-3">
+                    <label class="form-label small text-white-50">ASSUNTO</label>
+                    <input type="text" name="titulo" class="form-control form-control-atlantis" 
+                           placeholder="Ex: Barulho excessivo - Unidade 202" required>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label small text-white-50">DETALHES DA OCORRÊNCIA</label>
+                    <textarea name="descricao" class="form-control form-control-atlantis" rows="6" 
+                              placeholder="Descreva o ocorrido com o máximo de detalhes possível..." required></textarea>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <a href="{% url 'core:dashboard' %}" class="btn btn-atlantis w-100">CANCELAR</a>
+                    <button type="submit" class="btn btn-atlantis w-100 fw-bold">ENVIAR RELATO</button>
+                </div>
+            </form>
+        </div>
+        
+        <div class="text-center mt-4">
+            <p class="small text-white-50">
+                <i class="bi bi-shield-lock"></i> Seu relato será enviado diretamente para a administração.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card-atlantis border-gold shadow-lg">
+            <h3 class="text-gold"><i class="bi bi-file-earmark-pdf"></i> Novo Balancete</h3>
+            <p class="text-white-50">Selecione o arquivo PDF para disponibilizar aos moradores.</p>
+            <hr class="border-secondary">
+        {% if form.errors %}
+    <div class="alert alert-danger">
+        {{ form.errors }}
+    </div>
+{% endif %}
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="mb-3 text-white">
+                    {{ form.as_p }}
+                </div>
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-atlantis">
+                        <i class="bi bi-cloud-upload"></i> Salvar e Publicar
+                    </button>
+                    <a href="{% url 'core:dashboard' %}" class="btn btn-outline-light">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

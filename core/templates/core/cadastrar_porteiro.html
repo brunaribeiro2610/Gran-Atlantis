@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card-atlantis shadow-lg">
+            <h3 class="btn btn-atlantis w-100 py-2 mt-3" style="color: var(--gold-logo);">👔 Cadastrar Novo Funcionário</h3>
+            <p class="text-center text-muted small">Acesso restrito: Apenas Síndicos podem cadastrar porteiros.</p>
+            
+            <form method="post" class="mt-4">
+                {% csrf_token %}
+                
+                {% for field in form %}
+                    <div class="mb-3">
+                        <label class="form-label text-gold small">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}
+                            <div class="text-danger small">{{ field.errors }}</div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+
+                <button type="submit" class="btn btn-atlantis w-100 py-2 mt-3">Finalizar Cadastro</button>
+            </form>
+            
+            <div class="text-center mt-4">
+                <a href="{% url 'core:dashboard' %}" class="btn btn-atlantis w-100 py-2 mt-3">← Cancelar e Voltar</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Estilização rápida para os inputs do Django baterem com o tema */
+    input, select {
+        width: 100%;
+        padding: 8px;
+        background-color: #0c0c0c !important;
+        border: 1px solid #444 !important;
+        color: white !important;
+        border-radius: 5px;
+    }
+</style>
+{% endblock %}

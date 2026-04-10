@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    {# CABEÇALHO PADRONIZADO #}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card-atlantis d-flex justify-content-between align-items-center p-3 shadow">
+                <h2 class="text-gold fw-bold m-0" style="font-size: 1.5rem;">
+                    <i class="bi bi-box-seam"></i> Registrar Encomenda
+                </h2>
+                <div style="width: auto;">
+                    <a href="{% url 'core:dashboard' %}" class="btn-atlantis text-decoration-none px-4 py-2" style="font-size: 0.9rem; display: inline-block; width: auto; margin-top: 0;">
+                        <i class="bi bi-house-door"></i> Voltar ao Painel
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# FORMULÁRIO DE ENCOMENDA #}
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card-atlantis shadow p-4">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3 text-start">
+                        <label class="small fw-bold text-white">Destinatário (Morador)</label>
+                        {{ form.morador }} </div>
+                    <div class="mb-3 text-start">
+                        <label class="small fw-bold text-white">Descrição do Pacote</label>
+                        <input type="text" name="descricao" class="form-control" placeholder="Ex: Pacote Amazon, iFood, etc.">
+                    </div>
+                    <button type="submit" class="btn-atlantis border-0 w-100 mt-3">Confirmar Recebimento</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

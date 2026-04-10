@@ -1,0 +1,48 @@
+<hr class="border-secondary my-5">
+
+<div class="row">
+    <div class="col-12">
+        <div class="card-atlantis border-gold shadow mb-5">
+            <div class="card-body">
+                <h5 class="text-gold mb-4"><i class="bi bi-calendar-check"></i> Reservas de Hoje (Piscina)</h5>
+                
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover align-middle">
+                        <thead>
+                            <tr class="text-gold border-secondary">
+                                <th>Hora</th>
+                                <th>Morador</th>
+                                <th>Unidade (Rua/Casa)</th> <th>Local</th>
+                                <th class="text-center">Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for reserva in reservas_piscina %}
+                            <tr class="border-secondary">
+                                <td class="fw-bold text-info">{{ reserva.hora_inicio|time:"H:i" }}</td>
+                                <td class="text-white">{{ reserva.morador.get_full_name|default:reserva.morador.username }}</td>
+                                
+                                <td class="text-warning fw-bold">
+                                    {{ reserva.morador.casa_bloco|default:"-" }}
+                                </td>
+                                
+                                <td>
+                                    <span class="badge bg-primary">Piscina</span>
+                                </td>
+                                
+                                <td class="text-center">
+                                    <button class="btn btn-sm btn-outline-success">OK</button>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center text-white-50 py-4">Nenhuma reserva de piscina para hoje.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

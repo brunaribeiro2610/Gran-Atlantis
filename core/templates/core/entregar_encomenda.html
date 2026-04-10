@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            
+            {# --- CARD PRINCIPAL COM BORDA DOURADA (Tema Atlantis) --- #}
+            <div class="card-atlantis p-4 shadow-lg" style="background-color: #1a1a1a; border: 1px solid var(--gold-logo); border-radius: 12px;">
+                
+                {# TÍTULO CENTRALIZADO (ESTILO DA IMAGEM) #}
+                <h2 class="text-center mb-4" style="color: var(--gold-logo); font-family: 'Poppins', sans-serif; font-weight: bold;">
+                    Baixa de Encomenda
+                </h2>
+                
+                {# --- 1ª CAIXA DE INFORMAÇÕES (ESTRUTURA DA IMAGEM, CORES ATLANTIS) --- #}
+                <div class="p-3 mb-4 rounded text-center" style="background-color: #2d2d2d; border: 1px solid #444;">
+                    <p class="mb-1 text-gold small text-uppercase fw-bold" style="letter-spacing: 1px;">Morador:</p>
+                    <p class="mb-0 text-white fw-bold fs-5">
+                        {% if encomenda.morador.get_full_name %}
+                            {{ encomenda.morador.get_full_name }}
+                        {% else %}
+                            {{ encomenda.morador.username|upper }}
+                        {% endif %}
+                    </p>
+                    <p class="mb-0 mt-2 text-white-50 small">Pacote: {{ encomenda.descricao|default:"Não informada" }}</p>
+                </div>
+
+                {# --- FORMULÁRIO DE BAIXA --- #}
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    {# RÓTULO E CAMPO DE ENTRADA (ESTILO DA IMAGEM) #}
+                    <div class="mb-4 text-center">
+                        <label class="form-label text-gold small fw-bold text-uppercase" style="letter-spacing: 1px;">
+                            Nome de quem está retirando:
+                        </label>
+                        <input type="text" name="retirado_por" 
+                               class="form-control text-center py-2" 
+                               placeholder="Ex: O Próprio, Esposa, Filho..." 
+                               required autofocus 
+                               style="background: rgba(0,0,0,0.3); border: 1px solid var(--gold-logo); color: white; border-radius: 8px;">
+                    </div>
+
+                    {# --- BOTÕES ALINHADOS LADO A LADO (ESTILO DA IMAGEM) --- #}
+                    <div class="d-flex gap-3 mb-4">
+                        {# CANCELAR (VERMELHO OUTLINE) #}
+                        <a href="{% url 'core:dashboard' %}" class="btn btn-atlantis w-100 w-100 py-2 fw-bold text-uppercase">
+                            Cancelar
+                        </a>
+                        {# CONFIRMAR (DOURADO ATLANTIS) #}
+                        <button type="submit" class="btn btn-atlantis w-100 py-2 fw-bold text-uppercase">
+                            Confirmar Retirada
+                        </button>
+                    </div>
+
+                    {# --- 2ª CAIXA DE INFORMAÇÕES (ESTRUTURA DA IMAGEM, CORES ATLANTIS) --- #}
+                    <div class="p-3 rounded text-center" style="background-color: #2d2d2d; border: 1px solid #444;">
+                        <p class="mb-1 text-gold small text-uppercase fw-bold" style="letter-spacing: 1px;">Proprietário da Encomenda:</p>
+                        <h4 class="text-white fw-bold mb-3">
+                            {% if encomenda.morador.get_full_name %}
+                                {{ encomenda.morador.get_full_name }}
+                            {% else %}
+                                {{ encomenda.morador.username|upper }}
+                            {% endif %}
+                        </h4>
+                        
+                        <p class="mb-1 text-gold small text-uppercase fw-bold" style="letter-spacing: 1px;">Conteúdo / Descrição:</p>
+                        <p class="text-white-50 mb-0">{{ encomenda.descricao|default:"Não informada" }}</p>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root { --gold-logo: #c5a059; }
+    
+    /* Botão Cancelar Vermelho para destaque negativo */
+    .btn-outline-danger {
+        border: 2px solid #dc3545 !important;
+        color: #dc3545 !important;
+        background: transparent !important;
+        transition: 0.3s;
+    }
+    .btn-outline-danger:hover {
+        background: #dc3545 !important;
+        color: white !important;
+        transform: translateY(-2px);
+    }
+
+    /* Botão Dourado Atlantis padrão */
+    .btn-atlantis {
+        background-color: var(--gold-logo);
+        color: #000;
+        border: none
+
+{% endblock %}

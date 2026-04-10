@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card-atlantis border-gold shadow p-4">
+                <h3 class="text-gold mb-4 text-center">ENVIAR BALANCETE</h3>
+                
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="mb-4">
+                        <label class="text-white mb-2 small fw-bold">MÊS DE REFERÊNCIA</label>
+                        <input type="month" name="mes_referencia" class="form-control bg-dark text-white border-secondary shadow-none" required>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="text-white mb-2 small fw-bold">ARQUIVO DO BALANCETE (PDF)</label>
+                        <input type="file" name="arquivo" accept="application/pdf" class="form-control bg-dark text-white border-secondary shadow-none" required>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-atlantis fw-bold">
+                            <i class="bi bi-check-circle me-2"></i>SALVAR BALANCETE
+                        </button>
+                        
+                        {# BOTÃO DE VOLTAR IGUAL AO DASHBOARD #}
+                        <a href="{% url 'core:dashboard' %}" class="btn btn-atlantis btn-sm px-3 shadow-sm mt-2">
+                            <i class="bi bi-arrow-left"></i> Voltar ao Painel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Garante que o input de arquivo não fique feio no modo escuro */
+    input[type="file"]::file-selector-button {
+        background-color: var(--gold-logo);
+        color: black;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 4px;
+        margin-right: 10px;
+        font-weight: bold;
+    }
+</style>
+{% endblock %}

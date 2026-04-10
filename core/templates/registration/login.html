@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="col-md-4 px-4">
+        <div class="text-center mb-4">
+            <img src="{% static 'img/logo.png' %}" alt="Gran Atlantis" style="max-width: 250px;">
+        </div>
+        
+        <div class="card-atlantis shadow-lg">
+            <h4 class="text-center mb-4" style="color: var(--gold-logo);">CONDOMÍNIO DIGITAL</h4>
+
+            {# --- MENSAGEM DE ERRO --- #}
+            {% if form.errors or error_message %}
+                <div class="alert alert-danger border-0 small text-center mb-4" style="background: rgba(220, 53, 69, 0.1); color: #ff6b6b; border-radius: 8px;">
+                    <i class="bi bi-exclamation-circle"></i> Usuário ou senha incorretos.
+                </div>
+            {% endif %}
+
+            <form method="post" id="loginForm">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label small text-white-50">USUÁRIO</label>
+                    <input type="text" name="username" class="form-control form-control-atlantis" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label small text-white-50">SENHA</label>
+                    <div class="input-group">
+                        <input type="password" name="password" id="id_password" class="form-control form-control-atlantis border-end-0" style="border-top-right-radius: 0; border-bottom-right-radius: 0;" required>
+                        <button class="btn btn-outline-secondary border-gold border-start-0" type="button" id="togglePassword" style="border-top-left-radius: 0; border-bottom-left-radius: 0; background: rgba(0,0,0,0.2);">
+                            <i class="bi bi-eye text-gold" id="eyeIcon"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-atlantis w-100 mt-2 fw-bold">ENTRAR</button>
+            </form>
+
+            <hr class="border-secondary mt-4">
+            <p class="text-center small text-white-50">
+                É morador e não tem acesso? <br>
+                <a href="{% url 'core:cadastro_morador' %}" class="fw-bold" style="color: var(--gold-logo); text-decoration: none;">Cadastre-se agora</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+{# --- SCRIPT PARA MOSTRAR/ESCONDER SENHA --- #}
+<script>
+    const togglePassword = document.querySelector('#togglePassword');
+    const password = document.querySelector('#id_password');
+    const eyeIcon = document.querySelector('#eyeIcon');
+
+    togglePassword.addEventListener('click', function () {
+        // Muda o tipo do input
+        const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+        password.setAttribute('type', type);
+        
+        // Alterna o ícone do olho
+        this.classList.toggle('active');
+        eyeIcon.classList.toggle('bi-eye');
+        eyeIcon.classList.toggle('bi-eye-slash');
+    });
+</script>
+
+<style>
+    /* Ajuste para o botão de senha não quebrar o estilo atlantis */
+    .input-group .btn-outline-secondary:hover {
+        background: transparent;
+        border-color: var(--gold-logo);
+    }
+    .form-control-atlantis:focus {
+        box-shadow: none;
+        border-color: var(--gold-logo);
+    }
+</style>
+{% endblock %}

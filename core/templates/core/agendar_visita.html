@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    
+    {% if not sucesso %}
+    <div class="card-atlantis p-4 border-gold shadow mx-auto" style="max-width: 500px;">
+        <h2 class="text-gold mb-4">Agendar Visita</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-atlantis w-100 py-3">GERAR ACESSO</button>
+        </form>
+    
+    
+
+</div>
+
+    {% else %}
+
+    <div class="card-atlantis border-gold p-5 text-center shadow-lg mx-auto" style="max-width: 500px;">
+        <div class="fs-1 mb-3">✅</div>
+        <h2 class="text-gold mb-4">Acesso Gerado!</h2>
+        <p class="text-white">O convite para <strong>{{ visita.nome }}</strong> está pronto.</p>
+
+        <div id="qrcode" class="bg-white p-3 rounded my-4 d-inline-block"></div>
+
+        <div class="bg-dark p-3 rounded border border-secondary text-start mb-4">
+            <small class="text-gold d-block small">DATA DA VISITA:</small>
+            <span class="text-white fw-bold">{{ visita.data_visita|date:"d/m/Y" }}</span>
+        </div>
+
+        <button onclick="enviarERetornar()" class="btn btn-success w-100 py-3 fw-bold mb-3" style="background-color: #25d366; border: none; color: white;">
+            ENVIAR PARA WHATSAPP
+        </button>
+        
+        <a href="{% url 'core:dashboard' %}" class="text-muted small">Voltar sem enviar</a>
+    </div>
+    {% endif %}
+
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+{% if sucesso %}
+<script>
+    // 1. Gera o QR Code assim que a página de sucesso carrega
+    new QRCode(document.getElementById("qrcode"), {
+        text: "{{ visita.id }}",
+        width: 200,
+        height: 200
+    });
+
+    // 2. Função que abre o Zap e volta para o Painel
+    function enviarERetornar() {
+        const nome = "{{ visita.nome }}";
+        const data = "{{ visita.data_visita|date:'d/m' }}";
+        const linkQr = "https://pyrophoric-daleyza-precorruptive.ngrok-free.dev/visita/detalhes/{{ visita.id }}/";
+        
+        const mensagem = `Olá ${nome}! Seu acesso ao Gran Atlantis para o dia ${data} está pronto. ✅\n\nApresente este QR Code na portaria: ${linkQr}`;
+        
+        // Abre o WhatsApp (O navegador NÃO bloqueia porque é um clique do usuário)
+        window.open(`https://wa.me/?text=${encodeURIComponent(mensagem)}`, '_blank');
+
+        // Volta para o painel do morador
+        setTimeout(function() {
+            window.location.href = "{% url 'core:dashboard' %}";
+        }, 500);
+
+    
+    }
+</script>
+{% endif %}
+
+<style>
+    .card-atlantis { background: #1a1a1a; border-radius: 15px; }
+    .text-gold { color: #c5a059; }
+    .border-gold { border: 1px solid #c5a059 !important; }
+    .btn-atlantis { background-color: #c5a059; color: #000; font-weight: bold; border: none; }
+    .btn-atlantis:hover { background-color: #a38446; color: #fff; }
+</style>
+{% endblock %}

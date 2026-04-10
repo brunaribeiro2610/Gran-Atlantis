@@ -1,0 +1,53 @@
+:root {
+    --bg-dark: #000000; /* Preto absoluto */
+    --bg-card: #1a1a1a; /* Cinza grafite escuro */
+    --gold-logo: #d4af37; /* Dourado metálico */
+    --gold-light: #f1c40f;
+    --text-white: #ffffff;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-white);
+    font-family: 'Inter', sans-serif;
+}
+
+.navbar-atlantis {
+    background-color: var(--bg-dark);
+    border-bottom: 2px solid var(--gold-logo);
+    padding: 1rem;
+}
+
+.card-atlantis {
+    background-color: var(--bg-card);
+    border: 1px solid #333;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.1); /* Brilho dourado sutil */
+    padding: 2rem;
+}
+
+.btn-atlantis {
+    background: linear-gradient(45deg, var(--gold-logo), var(--gold-light));
+    color: #000;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    transition: 0.3s;
+}
+
+.btn-atlantis:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0 10px var(--gold-logo);
+}
+
+.form-control-atlantis {
+    background-color: #0c0c0c !important;
+    border: 1px solid #444 !important;
+    color: white !important;
+}
+
+.form-control-atlantis:focus {
+    border-color: var(--gold-logo) !important;
+    box-shadow: 0 0 5px var(--gold-logo) !important;
+}

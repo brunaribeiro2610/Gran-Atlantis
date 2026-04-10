@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    
+    {# CABEÇALHO DENTRO DO "QUADRADO DOURADO" (IGUAL AO DASHBOARD) #}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card-atlantis d-flex justify-content-between align-items-center p-3 shadow">
+                <h2 class="text-gold fw-bold m-0" style="font-size: 1.5rem;">
+                    <i class="bi bi-clipboard-check"></i> Ocorrências
+                </h2>
+                
+                <div style="width: auto;">
+                    <a href="{% url 'core:dashboard' %}" class="btn-atlantis text-decoration-none px-4 py-2" style="font-size: 0.9rem; display: inline-block; width: auto; margin-top: 0;">
+                        <i class="bi bi-house-door"></i> Voltar ao Painel
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        {# SE FOR MORADOR: MOSTRA O FORMULÁRIO DE REGISTRO #}
+        {% if user_role_fixed == "MORADOR" %}
+        <div class="col-md-4 mb-4">
+            <div class="card-atlantis shadow">
+                <h5 class="text-gold"><i class="bi bi-plus-lg"></i> Novo Relato</h5>
+                <hr class="border-secondary">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3 text-start">
+                        <label class="small fw-bold text-white">Título do Problema</label>
+                        <input type="text" name="titulo" class="form-control" placeholder="Ex: Vazamento na garagem" required>
+                    </div>
+                    <div class="mb-3 text-start">
+                        <label class="small fw-bold text-white">Descrição Completa</label>
+                        <textarea name="descricao" class="form-control" rows="4" placeholder="Detalhe o ocorrido..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn-atlantis border-0 w-100">Enviar para Portaria</button>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+
+        {# TABELA DE HISTÓRICO #}
+        <div class="{% if user_role_fixed == 'MORADOR' %}col-md-8{% else %}col-12{% endif %}">
+            <div class="card-atlantis shadow">
+                <h5 class="text-gold"><i class="bi bi-list-ul"></i> Histórico de Registros</h5>
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover mt-3">
+                        <thead>
+                            <tr class="text-gold border-secondary small text-center">
+                                <th>Data</th>
+                                {% if user_role_fixed != "MORADOR" %}<th>Morador</th>{% endif %}
+                                <th class="text-start">Assunto</th>
+                                <th>Status</th>
+                                {% if user_role_fixed != "MORADOR" %}<th>Ação</th>{% endif %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for o in ocorrencias %}
+                            <tr class="border-secondary align-middle small text-center">
+                                <td>{{ o.data_registro|date:"d/m/Y H:i" }}</td>
+                                {% if user_role_fixed != "MORADOR" %}
+                                    <td>
+                                        <span class="text-white">{{ o.morador.username }}</span><br>
+                                        <small class="text-gold">{{ o.morador.casa_bloco|default:"-" }}</small>
+                                    </td>
+                                {% endif %}
+                                <td class="text-start">
+                                    <strong class="text-white">{{ o.titulo }}</strong><br>
+                                    <small class="text-white-50">{{ o.descricao|truncatechars:50 }}</small>
+                                </td>
+                                <td>
+                                    {% if o.status == 'ABERTO' %}
+                                        <span class="badge bg-danger">PENDENTE</span>
+                                    {% elif o.status == 'RECEBIDO' %}
+                                        <span class="badge bg-info text-dark">RECEBIDO</span>
+                                    {% else %}
+                                        <span class="badge bg-success">RESOLVIDO</span>
+                                    {% endif %}
+                                </td>
+                                
+                                {% if user_role_fixed != "MORADOR" %}
+                                <td>
+                                    {% if o.status == 'ABERTO' %}
+                                        <a href="{% url 'core:marcar_recebido' o.id %}" class="btn btn-sm btn-warning fw-bold shadow-sm">
+                                            Receber
+                                        </a>
+                                    {% else %}
+                                        <i class="bi bi-check2-all text-success fs-5"></i>
+                                    {% endif %}
+                                </td>
+                                {% endif %}
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="py-4 text-white-50 text-center">Nenhum registro encontrado.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Ajustes para manter o padrão Gran Atlantis */
+    label { color: white !important; }
+    .table-dark { --bs-table-bg: transparent; }
+    .btn-atlantis:hover { color: #000 !important; filter: brightness(1.1); }
+</style>
+{% endblock %}

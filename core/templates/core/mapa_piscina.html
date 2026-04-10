@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card-atlantis shadow-lg">
+    <div class="mb-4">
+        <h3 class="text-gold m-0">
+            <i class="bi bi-water"></i> Controle de Piscina
+        </h3>
+        <p class="text-muted small">Agendamentos para hoje: {{ hoje|date:"d/m/Y" }}</p>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-dark table-hover border-secondary">
+            <thead>
+                <tr class="text-gold text-center">
+                    <th class="text-start">Morador / Titular</th>
+                    <th>Unidade</th>
+                    <th>Horário</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reserva in agendamentos %}
+                <tr class="text-center">
+                    <td class="align-middle text-start fw-bold">
+                        {{ reserva.morador.get_full_name|default:reserva.morador.username }}
+                    </td>
+                    <td class="align-middle">
+                        <span class="badge bg-outline-gold">
+                            {{ reserva.morador.casa_bloco|default:"-" }}
+                        </span>
+                    </td>
+                    <td class="align-middle text-info fw-bold" style="font-size: 1.1rem;">
+                        {{ reserva.hora_inicio }}
+                    </td>
+                    <td class="align-middle">
+                        {# Lógica visual para saber se é o horário atual #}
+                        <span class="badge bg-success">Confirmado</span>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center text-muted py-5">
+                        <i class="bi bi-calendar-x d-block mb-2" style="font-size: 2rem;"></i>
+                        Nenhuma reserva para a piscina hoje.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="mt-4">
+        <a href="{% url 'core:dashboard' %}" class="text-muted small text-decoration-none">
+            <i class="bi bi-arrow-left"></i> Voltar para Dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}
